@@ -1,8 +1,11 @@
-
+import logging
 from common import redis
 from util import check
 from util import import_string
 from config import REDIS_KEY_RAW, REDIS_KEY_USEFUL, proxy_modules
+
+
+logger = logging.getLogger('proxy_pool')
 
 
 def _verify_proxy_raw(proxy):
@@ -45,6 +48,7 @@ def _crawl_proxy():
     for module in proxy_modules:
         Proxy = import_string(module)
         p = Proxy()
+        logger.info('running: {}.crawl'.format(p.__class__.__name__))
         ip_ports = p.crawl()
         yield ip_ports
 
