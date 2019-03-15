@@ -51,4 +51,5 @@ def _crawl_proxy():
 
 def _save_to_db(ip_ports):
     for proxy in ip_ports:
-        redis.hset(REDIS_KEY_RAW, proxy, '1')
+        if proxy and check(proxy):
+            redis.hset(REDIS_KEY_USEFUL, proxy, '1')

@@ -94,6 +94,18 @@ class Request(object):
             time.sleep(interval)
             self.retry_time += 1
             logger.debug('request {} fail'.format(url))
-            return self.get(url, timeout=timeout, interval=interval, **kwargs)
+            return self.get(url, timeout=timeout, interval=interval,
+                            proxies=self.proxies, **kwargs)
 
         return res
+
+    @property
+    def proxies(self):
+        try:
+            p = requests.get('http://127.0.0.1:6001/get').content.decode()
+            proxies = {
+                "http": "http://{}".format(p),
+            }
+        except:
+            proxies = None
+        return proxies

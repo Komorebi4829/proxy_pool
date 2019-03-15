@@ -75,6 +75,8 @@ class ProxyXiCi(_ProxyBase):
             for i in range(1, page + 1):
                 url = url + str(i)
                 content = self.request.get(url).content
+                if not content:
+                    continue
                 root = html.fromstring(content)
                 proxy_list = root.xpath('.//table[@id="ip_list"]//tr[position()>1]')
                 for proxy in proxy_list:
