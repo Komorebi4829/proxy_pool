@@ -4,7 +4,6 @@ import requests
 from fake_useragent import UserAgent
 import logging
 
-
 try:
     _ua = UserAgent()
 except Exception as e:
@@ -94,8 +93,8 @@ class Request(object):
             time.sleep(interval)
             self.retry_time += 1
             logger.debug('request {} fail'.format(url))
-            return self.get(url, timeout=timeout, interval=interval,
-                            proxies=self.proxies, **kwargs)
+            kwargs['proxies'] = self.proxies
+            return self.get(url, timeout=timeout, interval=interval, **kwargs)
 
         return res
 
