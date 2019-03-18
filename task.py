@@ -4,7 +4,7 @@ from concurrent import futures
 from common import redis
 from config import REDIS_KEY_RAW, REDIS_KEY_USEFUL, max_num
 from _task import _crawl_proxy, _save_to_db, _verify_proxy_raw, _verify_proxy_useful
-
+from proxy_pool import ProxyPool
 
 logger = logging.getLogger('proxy_pool')
 
@@ -33,12 +33,12 @@ def verify_proxy_useful():
     :return:
     """
     logger.info('开始验证 useful 代理')
-    key = REDIS_KEY_USEFUL
-    proxys = redis.hkeys(key)
-    if not proxys:
+    count = ProxyPool.count()
+    if not count == 0:
         logger.info('useful 代理数量为零, 验证 done')
         return
     with futures.ThreadPoolExecutor(max_workers=10) as executor:
+        proxys = ProxyPool.all()
         for proxy, result in zip(proxys, executor.map(_verify_proxy_useful, proxys)):
             # 无需知道结果
             pass
@@ -51,9 +51,7 @@ def crawl_proxy():
     :return:
     """
     logger.info('开始运行爬虫...')
-    key = REDIS_KEY_USEFUL
-    num = redis.hlen(key)
-    if num > max_num:
+    if ProxyPool.full():
         logger.info('代理数量大于{}, 停止爬取'.format(max_num))
         return
 

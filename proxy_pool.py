@@ -21,8 +21,8 @@ class ProxyPool(object):
         if not os.path.exists(log_path):
             os.mkdir(log_path)
 
-        today = time.strftime('%Y-%m-%d', time.localtime())
-        name = "proxy_pool_" + today
+        # today = time.strftime('%Y-%m-%d', time.localtime())
+        name = "proxy_pool.log"
         filename = os.path.join(log_path, name)
         log = logging.getLogger("proxy_pool")
         f = '%(asctime)s [%(name)s] %(filename)s(+%(lineno)d) %(levelname)s: %(message)s'
@@ -41,7 +41,7 @@ class ProxyPool(object):
 
     @staticmethod
     def get():
-        proxys = redis.hkeys(config.REDIS_KEY_USEFUL)
+        proxys = ProxyPool.all()
         if not proxys:
             return 'empty proxy'
         return random.choice(proxys)
@@ -50,3 +50,16 @@ class ProxyPool(object):
     def count():
         n = redis.hlen(config.REDIS_KEY_USEFUL)
         return n
+
+    @staticmethod
+    def full():
+        max_num = config.max_num
+        if ProxyPool.count() > max_num:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def all():
+        proxys = redis.hkeys(config.REDIS_KEY_USEFUL)
+        return proxys
