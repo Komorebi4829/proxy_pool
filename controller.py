@@ -11,16 +11,16 @@ proxy_pool = ProxyPool()
 
 def start_service():
     funcs = [
-        scheduler.crawl,
-        scheduler.verify_raw,
-        scheduler.verify_useful,
+        scheduler.start_crawl_scheduler,
+        scheduler.start_verify_scheduler,
         run_app,
     ]
     tasks = []
-    for func in funcs:
-        executor = futures.ProcessPoolExecutor(max_workers=1)
-        future = executor.submit(func)
-        tasks.append(future)
+    with futures.ProcessPoolExecutor(max_workers=3) as executor:
+        crawl = executor.submit(funcs[0])
+        verify = executor.submit(funcs[1])
+        app = executor.submit(funcs[2])
+        tasks.append([crawl, verify, app])
 
     crawl_proxy()
     verify_proxy_raw()

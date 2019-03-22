@@ -34,7 +34,7 @@ def verify_proxy_useful():
     """
     logger.info('开始验证 useful 代理')
     count = ProxyPool.count()
-    if not count == 0:
+    if count == 0:
         logger.info('useful 代理数量为零, 验证 done')
         return
     with futures.ThreadPoolExecutor(max_workers=10) as executor:
